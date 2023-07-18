@@ -20,11 +20,11 @@ def split_file(file_path):
                 break
         
         num_header_lines = len(header_lines)
-        lines_per_part = output_file_size
-        
-        if total_lines <= num_header_lines + lines_per_part:
-            # If the total lines are smaller or equal to the chunk size
+
+        if total_lines <= num_header_lines + output_file_size:
+            # If the total lines are smaller or equal to the output file size
             total_parts = 1
+            lines_per_part = total_lines - num_header_lines
             output_file = f"RUNID_part_1_of_{total_parts}.txt"
 
             with open(output_file, 'w') as output:
@@ -34,11 +34,12 @@ def split_file(file_path):
             print("Total lines:", total_lines)
             return
 
-        total_parts = math.ceil((total_lines - num_header_lines) / lines_per_part)
+        total_parts = math.ceil((total_lines - num_header_lines) / output_file_size)
+        lines_per_part = math.ceil((total_lines - num_header_lines) / total_parts)
 
         for part in range(total_parts):
             start_index = num_header_lines + (part * lines_per_part)
-            end_index = start_index + lines_per_part
+            end_index = min(start_index + lines_per_part, total_lines)
             output_file = f"RUNID_part_{part+1}_of_{total_parts}.txt"
 
             with open(output_file, 'w') as output:
